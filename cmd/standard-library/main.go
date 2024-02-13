@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"regexp"
 
@@ -10,12 +11,13 @@ import (
 )
 
 func main() {
+	mux := http.NewServeMux()
+
+	home := HomeHandler{}
+	mux.Handle("/", &home)
 
 	store := recipes.NewMemStore()
 	recipesHandler := NewRecipesHandler(store)
-
-	mux := http.NewServeMux()
-	mux.Handle("/", &HomeHandler{})
 	mux.Handle("/recipes", recipesHandler)
 	mux.Handle("/recipes/", recipesHandler)
 
@@ -35,9 +37,7 @@ type RecipesHandler struct {
 }
 
 func NewRecipesHandler(s recipeStore) *RecipesHandler {
-	return &RecipesHandler{
-		store: s,
-	}
+	return &RecipesHandler{store: s}
 }
 
 var (
@@ -46,7 +46,6 @@ var (
 )
 
 func (h *RecipesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	println(r.URL.Path, r.Method)
 	switch {
 	case r.Method == http.MethodPost && RecipeRe.MatchString(r.URL.Path):
 		h.Add(w, r)
@@ -69,23 +68,18 @@ func (h *RecipesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *RecipesHandler) Add(w http.ResponseWriter, r *http.Request) {
-	println("alfiasdliasn")
-	// Recipe object that will be populated from JSON payload
 	var recipe recipes.Recipe
 	if err := json.NewDecoder(r.Body).Decode(&recipe); err != nil {
 		InternalServerErrorHandler(w, r)
 		return
 	}
 
-	// Convert the name of the recipe into URL friendly string
 	resourceID := slug.Make(recipe.Name)
-	// Call the store to add the recipe
 	if err := h.store.Add(resourceID, recipe); err != nil {
 		InternalServerErrorHandler(w, r)
 		return
 	}
 
-	// Set the status code to 200
 	w.WriteHeader(http.StatusOK)
 }
 
@@ -98,7 +92,7 @@ func (h *RecipesHandler) Get(w http.ResponseWriter, r *http.Request) {
 
 	recipe, err := h.store.Get(matches[1])
 	if err != nil {
-		if err == recipes.NotFoundErr {
+		if errors.Is(err, recipes.NotFoundErr) {
 			NotFoundHandler(w, r)
 			return
 		}
@@ -148,7 +142,7 @@ func (h *RecipesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.store.Update(matches[1], recipe); err != nil {
-		if err == recipes.NotFoundErr {
+		if errors.Is(err, recipes.NotFoundErr) {
 			NotFoundHandler(w, r)
 			return
 		}
@@ -174,6 +168,12 @@ func (h *RecipesHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+type HomeHandler struct{}
+
+func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	_, _ = w.Write([]byte("This is my homepage"))
+}
+
 func InternalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusInternalServerError)
 	_, _ = w.Write([]byte("500 Internal Server Error"))
@@ -182,10 +182,4 @@ func InternalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
 func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotFound)
 	_, _ = w.Write([]byte("404 Not Found"))
-}
-
-type HomeHandler struct{}
-
-func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	_, _ = w.Write([]byte("This is my homepage"))
 }
