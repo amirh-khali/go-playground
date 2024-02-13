@@ -69,13 +69,13 @@ func (h *RecipesHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 func (h *RecipesHandler) Add(w http.ResponseWriter, r *http.Request) {
 	var recipe recipes.Recipe
 	if err := json.NewDecoder(r.Body).Decode(&recipe); err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	resourceID := slug.Make(recipe.Name)
 	if err := h.store.Add(resourceID, recipe); err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
@@ -85,24 +85,24 @@ func (h *RecipesHandler) Add(w http.ResponseWriter, r *http.Request) {
 func (h *RecipesHandler) Get(w http.ResponseWriter, r *http.Request) {
 	matches := RecipeReWithId.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	recipe, err := h.store.Get(matches[1])
 	if err != nil {
 		if errors.Is(err, recipes.NotFoundErr) {
-			NotFoundHandler(w, r)
+			NotFoundHandler(w)
 			return
 		}
 
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	jsonBytes, err := json.Marshal(recipe)
 	if err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
@@ -113,13 +113,13 @@ func (h *RecipesHandler) Get(w http.ResponseWriter, r *http.Request) {
 func (h *RecipesHandler) List(w http.ResponseWriter, r *http.Request) {
 	resources, err := h.store.List()
 	if err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	jsonBytes, err := json.Marshal(resources)
 	if err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
@@ -130,22 +130,22 @@ func (h *RecipesHandler) List(w http.ResponseWriter, r *http.Request) {
 func (h *RecipesHandler) Update(w http.ResponseWriter, r *http.Request) {
 	matches := RecipeReWithId.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	var recipe recipes.Recipe
 	if err := json.NewDecoder(r.Body).Decode(&recipe); err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	if err := h.store.Update(matches[1], recipe); err != nil {
 		if errors.Is(err, recipes.NotFoundErr) {
-			NotFoundHandler(w, r)
+			NotFoundHandler(w)
 			return
 		}
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
@@ -155,12 +155,12 @@ func (h *RecipesHandler) Update(w http.ResponseWriter, r *http.Request) {
 func (h *RecipesHandler) Remove(w http.ResponseWriter, r *http.Request) {
 	matches := RecipeReWithId.FindStringSubmatch(r.URL.Path)
 	if len(matches) < 2 {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
 	if err := h.store.Remove(matches[1]); err != nil {
-		InternalServerErrorHandler(w, r)
+		InternalServerErrorHandler(w)
 		return
 	}
 
@@ -173,12 +173,12 @@ func (h *HomeHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	_, _ = w.Write([]byte("This is my homepage"))
 }
 
-func InternalServerErrorHandler(w http.ResponseWriter, r *http.Request) {
+func InternalServerErrorHandler(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusInternalServerError)
 	_, _ = w.Write([]byte("500 Internal Server Error"))
 }
 
-func NotFoundHandler(w http.ResponseWriter, r *http.Request) {
+func NotFoundHandler(w http.ResponseWriter) {
 	w.WriteHeader(http.StatusNotFound)
 	_, _ = w.Write([]byte("404 Not Found"))
 }
