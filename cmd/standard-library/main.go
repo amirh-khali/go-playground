@@ -16,8 +16,7 @@ func main() {
 	home := HomeHandler{}
 	mux.Handle("/", &home)
 
-	store := recipes.NewMemStore()
-	recipesHandler := NewRecipesHandler(store)
+	recipesHandler := NewRecipesHandler()
 	mux.Handle("/recipes", recipesHandler)
 	mux.Handle("/recipes/", recipesHandler)
 
@@ -36,8 +35,8 @@ type RecipesHandler struct {
 	store recipeStore
 }
 
-func NewRecipesHandler(s recipeStore) *RecipesHandler {
-	return &RecipesHandler{store: s}
+func NewRecipesHandler() *RecipesHandler {
+	return &RecipesHandler{store: recipes.NewMemStore()}
 }
 
 var (

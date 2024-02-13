@@ -16,9 +16,8 @@ func main() {
 	home := HomeHandler{}
 	router.HandleFunc("/", home.ServeHTTP)
 
-	store := recipes.NewMemStore()
 	s := router.PathPrefix("/recipes").Subrouter()
-	NewRecipesHandler(store, s)
+	NewRecipesHandler(s)
 
 	_ = http.ListenAndServe(":8080", router)
 }
@@ -35,8 +34,8 @@ type RecipesHandler struct {
 	store recipeStore
 }
 
-func NewRecipesHandler(s recipeStore, router *mux.Router) *RecipesHandler {
-	handler := &RecipesHandler{store: s}
+func NewRecipesHandler(router *mux.Router) *RecipesHandler {
+	handler := &RecipesHandler{store: recipes.NewMemStore()}
 
 	router.HandleFunc("", handler.List).Methods("GET")
 	router.HandleFunc("/", handler.Add).Methods("POST")

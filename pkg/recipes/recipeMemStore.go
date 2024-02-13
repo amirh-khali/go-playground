@@ -10,9 +10,9 @@ type MemStore struct {
 	list map[string]Recipe
 }
 
-func NewMemStore() *MemStore {
+func NewMemStore() MemStore {
 	list := make(map[string]Recipe)
-	return &MemStore{
+	return MemStore{
 		list,
 	}
 }
