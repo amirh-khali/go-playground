@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/amirh-khali/orderbook/pkg/recipes"
+	"github.com/amirh-khali/go-playground/pkg/recipes"
 	"github.com/gin-gonic/gin"
 	"github.com/gosimple/slug"
 )

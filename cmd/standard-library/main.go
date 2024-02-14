@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/amirh-khali/orderbook/pkg/recipes"
+	"github.com/amirh-khali/go-playground/pkg/recipes"
 	"github.com/gosimple/slug"
 )
 

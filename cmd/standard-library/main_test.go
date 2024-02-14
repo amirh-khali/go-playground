@@ -8,7 +8,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/amirh-khali/orderbook/pkg/recipes"
+	"github.com/amirh-khali/go-playground/pkg/recipes"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -25,8 +25,7 @@ func readTestData(t *testing.T, name string) []byte {
 func TestRecipesHandlerCRUD_Integration(t *testing.T) {
 
 	// Create a MemStore and Recipe Handler
-	store := recipes.NewMemStore()
-	recipesHandler := NewRecipesHandler(store)
+	recipesHandler := NewRecipesHandler()
 
 	// Testdata
 	hamAndCheese := readTestData(t, "ham_and_cheese_recipe.json")
@@ -44,7 +43,7 @@ func TestRecipesHandlerCRUD_Integration(t *testing.T) {
 	defer res.Body.Close()
 	assert.Equal(t, 200, res.StatusCode)
 
-	saved, _ := store.List()
+	saved, _ := recipesHandler.store.List()
 	assert.Len(t, saved, 1)
 
 	// GET - find the record we just added
@@ -72,7 +71,7 @@ func TestRecipesHandlerCRUD_Integration(t *testing.T) {
 	defer res.Body.Close()
 	assert.Equal(t, 200, res.StatusCode)
 
-	updatedHamAndCheese, err := store.Get("ham-and-cheese-toasties")
+	updatedHamAndCheese, err := recipesHandler.store.Get("ham-and-cheese-toasties")
 	assert.NoError(t, err)
 
 	assert.Contains(t, updatedHamAndCheese.Ingredients, recipes.Ingredient{Name: "butter"})
@@ -86,7 +85,7 @@ func TestRecipesHandlerCRUD_Integration(t *testing.T) {
 	defer res.Body.Close()
 	assert.Equal(t, 200, res.StatusCode)
 
-	saved, _ = store.List()
+	saved, _ = recipesHandler.store.List()
 	assert.Len(t, saved, 0)
 
 }

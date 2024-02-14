@@ -1,4 +1,4 @@
-module github.com/amirh-khali/orderbook
+module github.com/amirh-khali/go-playground
 
 go 1.19
 

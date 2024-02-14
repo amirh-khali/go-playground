@@ -5,7 +5,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/amirh-khali/orderbook/pkg/recipes"
+	"github.com/amirh-khali/go-playground/pkg/recipes"
 	"github.com/gorilla/mux"
 	"github.com/gosimple/slug"
 )
