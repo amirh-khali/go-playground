@@ -7,47 +7,29 @@ Content-Type: application/json
 
 {
   "name": "Ham and cheese toasties",
-  "ingredients": [
-    {
-      "name": "bread"
-    },{
-      "name": "ham"
-    },{
-      "name": "cheese"
-    }
-  ]
+  "description": "sdligha;sdojaldfiSD;AS"
 }
 
 ###
 GET http://localhost:8080/recipes
 
 ###
-GET http://localhost:8080/recipes/ham-and-cheese-toasties
+GET http://localhost:8080/recipes/1
 
 ###
-PUT http://localhost:8080/recipes/ham-and-cheese-toasties
+PUT http://localhost:8080/recipes/1
 Content-Type: application/json
 
 {
   "name": "Ham and cheese toasties",
-  "ingredients": [
-    {
-      "name": "bread"
-    },{
-      "name": "ham"
-    },{
-      "name": "cheese"
-    },{
-      "name": "butter"
-    }
-  ]
+  "description": "SLDFIGHSLDNLASD"
 }
 
 ###
-GET http://localhost:8080/recipes/ham-and-cheese-toasties
+GET http://localhost:8080/recipes/1
 
 ###
-DELETE http://localhost:8080/recipes/ham-and-cheese-toasties
+DELETE http://localhost:8080/recipes/1
 
 ###
-GET http://localhost:8080/recipes/ham-and-cheese-toasties
+GET http://localhost:8080/recipes/2
